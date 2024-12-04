@@ -1,3 +1,4 @@
+var editor = CKEDITOR.instances[Object.keys(CKEDITOR.instances)[0]]; // Replace with your editor instance name if known
 function EqTextArea(preview, input, comment, download, intro) {
     this.changed = false;
     this.orgtxt = '';
@@ -246,7 +247,6 @@ function EqTextArea(preview, input, comment, download, intro) {
                 this.updateExportArea();
             }
         } else {
-            var editor = CKEDITOR.instances[Object.keys(CKEDITOR.instances)[0]]; // Replace with your editor instance name if known
             var pluginLang = editor.lang.enumath; // This accesses the loaded language strings
             if (bracket < 0) {
                 this.setcomment(pluginLang.closedBrackets);
@@ -266,7 +266,7 @@ function EqTextArea(preview, input, comment, download, intro) {
     copy_button: null,
     key_text: '',
     format: 'svg',
-    engine: 'codecogs',
+    engine: editor.config.ENUMATH_EQUATION_ENGINE,
     $: function(n) {
         return document.getElementById(n);
     },
@@ -362,7 +362,6 @@ function EqTextArea(preview, input, comment, download, intro) {
         if (this.targetFn !== null) this.targetFn(text)
     },
     reset: function() {
-        /* this.setSelIndx('engine', 'codecogs'); */
         this.targetArea.setcomment('');
         this.clearText();
     },
@@ -406,8 +405,6 @@ function EqTextArea(preview, input, comment, download, intro) {
         EqEditor.targetArea.renderEqn(null);
     },
     getEngine: function() {
-        var a = EqEditor.$('engine');
-        if (a) return a.value;
         return EqEditor.engine;
     },
     getFormat: function() {

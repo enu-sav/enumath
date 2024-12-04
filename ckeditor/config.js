@@ -32,5 +32,12 @@ CKEDITOR.editorConfig = function( config ) {
 	// Dialog windows are also simplified.
 	config.removeDialogTabs = 'link:advanced';
 
-	config.extraPlugins = 'enumath';
+	config.extraPlugins = 'enumath,sourcearea';
+
+	config.ENUMATH_EQUATION_ENGINE = 'vercel'; // Values: 'vercel' or 'codecogs'. Plugin then decides which engine url from enu_config.js to use
+	config.extraAllowedContent = { // To preserve inline styles in images after switching to source view
+		img: {
+				styles: true, // Allow inline styles
+		},
+	};
 };

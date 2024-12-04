@@ -22,8 +22,8 @@ CKEDITOR.plugins.add('enumath', {
 
 		// Add the link and unlink buttons.
 		editor.addCommand(pluginCmd, new CKEDITOR.dialogCommand(pluginCmd, {
-			allowedContent: 'img[src,alt]',
-			requiredContent: 'img[src,alt]'
+			allowedContent: 'img[src,alt,style]',
+			requiredContent: 'img[src,alt,style]',
 		}));
 
 		CKEDITOR.dialog.add(pluginCmd, this.path + "dialogs/enumath.js");

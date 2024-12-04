@@ -19,13 +19,6 @@ CKEDITOR.dialog.add( 'enumathDialog', function(editor)
 						html: `
 							<form style="display: flex; align-items: center; justify-content: space-between;">
 								<button type="button" onclick="EqEditor.reset()" style="padding: 5px 10px; color: white; background-color: #007bff; border: none; margin-right: 10px;">Reset</button>
-								<div>
-									<label for="engine" style="margin-right: 5px;">${editor.lang.enumath.engine}:</label>
-									<select id="engine" onchange="EqEditor.setEngine(this.value)" style="border: 1px solid #8fb6bd; padding: 5px;">
-										<option value="codecogs">Codecogs</option>
-										<option value="vercel">Vercel</option>
-									</select>
-								</div>
 							</form>
 						`
 					},
@@ -55,14 +48,15 @@ CKEDITOR.dialog.add( 'enumathDialog', function(editor)
 		],
 		
 		onLoad : function () {
-			 EqEditor.add(new EqTextArea('CCequation'+window.CCounter, 'CClatex'+window.CCounter, 'comment'),false);
-			document.getElementById('engine').value = EqEditor.getEngine();
+			EqEditor.add(new EqTextArea('CCequation'+window.CCounter, 'CClatex'+window.CCounter, 'comment'),false);
 		},
 				
 		onShow : function () {
 			var dialog = this,
 					sel = editor.getSelection(),
 					image = sel.getStartElement().getAscendant('img',true);
+
+			console.log(editor.config.testVar)
 			// has the users selected an equation. Make sure we have the image element, include itself		
 			if(image) 
 			{
@@ -71,9 +65,9 @@ CKEDITOR.dialog.add( 'enumathDialog', function(editor)
 				if(imgAlt !== null) {
 					EqEditor.getTextArea().setText(imgAlt);
 					if (imgSrc.includes('codecogs')) {
-						EqEditor.setSelIndx('engine', 'codecogs');
+						EqEditor.setEngine('codecogs');
 					} else {
-						EqEditor.setSelIndx('engine', 'vercel');
+						EqEditor.setEngine('vercel');
 					}
 				}
 				dialog.insertMode = true;
@@ -87,6 +81,7 @@ CKEDITOR.dialog.add( 'enumathDialog', function(editor)
 			var eqn = editor.document.createElement( 'img' );
 			eqn.setAttribute( 'alt', EqEditor.getTextArea().getLaTeX());
 			eqn.setAttribute( 'src', EqEditor.getTextArea().exportEquation('urlencoded'));
+			eqn.setAttribute( 'style', 'vertical-align: middle;');
 			editor.insertElement(eqn);
 			EqEditor.reset();
 		},
