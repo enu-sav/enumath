@@ -56,7 +56,6 @@ CKEDITOR.dialog.add( 'enumathDialog', function(editor)
 					sel = editor.getSelection(),
 					image = sel.getStartElement().getAscendant('img',true);
 
-			console.log(editor.config.testVar)
 			// has the users selected an equation. Make sure we have the image element, include itself		
 			if(image) 
 			{
