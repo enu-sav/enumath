@@ -80,7 +80,7 @@ CKEDITOR.dialog.add( 'enumathDialog', function(editor)
 			var eqn = editor.document.createElement( 'img' );
 			eqn.setAttribute( 'alt', EqEditor.getTextArea().getLaTeX());
 			eqn.setAttribute( 'src', EqEditor.getTextArea().exportEquation('urlencoded'));
-			eqn.setAttribute( 'style', 'vertical-align: middle;');
+			eqn.setAttribute( 'class', 'enumath');
 			editor.insertElement(eqn);
 			EqEditor.reset();
 		},
