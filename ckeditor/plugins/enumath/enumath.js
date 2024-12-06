@@ -187,7 +187,7 @@ function EqTextArea(preview, input, comment, download, intro) {
         var engine = EqEditor.getEngine();
         switch (type) {
             case 'encoded':
-                return encodeURI(this.getEquationStr()).replace(/\+/g, '%2b');
+                return encodeURIComponent(this.getEquationStr());
                 break;
             case 'urlencoded': {
                 this.exportMessage('The Encoded URL link to this equation is:');
