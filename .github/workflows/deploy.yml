@@ -10,7 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Staging runs automatically on develop, production only on main with manual trigger
     if: >
       (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
@@ -27,7 +26,7 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # Step 2: Set ENV
+      # Step 3: Set ENV based on branch
       - name: Set environment variable by branch
         run: |
           if [ "${GITHUB_REF##*/}" == "develop" ]; then
@@ -39,30 +38,43 @@ jobs:
             exit 1
           fi
 
-      # Step 4: Deploy to the destinations
+      # Step 4: Deploy to RS
       - name: Deploy to RS
+        env:
+          HOST_RS: ${{ vars.HOST_RS }}
+          DEPLOY_PATH_RS: ${{ vars.DEPLOY_PATH_RS }}
         run: |
-          HOST=deploy@${{ vars.HOST_RS }}
-          DIR=${{ vars.DEPLOY_PATH_RS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
-        
-          # Ensure the directory exists on the remote server
+          if [ -z "$HOST_RS" ]; then
+            echo "Error: HOST_RS is not defined. Exiting."
+            exit 1
+          fi
+
+          HOST=deploy@$HOST_RS
+          DIR=$DEPLOY_PATH_RS/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+
+          echo "Deploying to $HOST:$DIR"
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
-        
-          # COpy files to the remote server destination
           rsync -avz --delete \
             -e "ssh -p 5022 -o StrictHostKeyChecking=no" \
             ./ckeditor/plugins/enumath/ "$HOST:$DIR"
 
-      # Step 5: Deploy to the destinations
+
+      # Step 4: Deploy to WEBRS
       - name: Deploy to WEBRS
+        env:
+          HOST_WEBRS: ${{ vars.HOST_WEBRS }}
+          DEPLOY_PATH_WEBRS: ${{ vars.DEPLOY_PATH_WEBRS }}
         run: |
-          HOST=deploy@${{ vars.HOST_WEBRS }}
-          DIR=${{ vars.DEPLOY_PATH_WEBRS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          if [ -z "$HOST_WEBRS" ]; then
+            echo "Error: HOST_WEBRS is not defined. Exiting."
+            exit 1
+          fi
 
-          # Ensure the directory exists on the remote server
+          HOST=deploy@$HOST_WEBRS
+          DIR=$DEPLOY_PATH_WEBRS/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+
+          echo "Deploying to $HOST:$DIR"
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
-
-          # COpy files to the remote server destination
           rsync -avz --delete \
             -e "ssh -p 5022 -o StrictHostKeyChecking=no" \
             ./ckeditor/plugins/enumath/ "$HOST:$DIR"
