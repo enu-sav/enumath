@@ -26,31 +26,18 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # Step 3: Set ENV based on branch
-      - name: Set environment variable by branch
-        run: |
-          if [ "${GITHUB_REF##*/}" == "develop" ]; then
-            echo "environment=stage" >> $GITHUB_ENV
-          elif [ "${GITHUB_REF##*/}" == "main" ]; then
-            echo "environment=prod" >> $GITHUB_ENV
-          else
-            echo "Unknown branch: ${GITHUB_REF##*/}"
-            exit 1
-          fi
-
-      # Step 4: Deploy to RS
+      # Step 3: Deploy to RS
       - name: Deploy to RS
-        env:
-          HOST_RS: ${{ vars.HOST_RS }}
-          DEPLOY_PATH_RS: ${{ vars.DEPLOY_PATH_RS }}
         run: |
-          if [ -z "$HOST_RS" ]; then
-            echo "Error: HOST_RS is not defined. Exiting."
-            exit 1
+          HOST=deploy@$HOST_RS_PROD
+          DEPLOY_PATH=$DEPLOY_PATH_RS_PROD
+          
+          if [ "${GITHUB_REF##*/}" == "develop" ]; then
+            HOST=deploy@$HOST_RS_STAGE
+            DEPLOY_PATH=$DEPLOY_PATH_RS_STAGE
           fi
-
-          HOST=deploy@$HOST_RS
-          DIR=$DEPLOY_PATH_RS/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          
+          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
 
           echo "Deploying to $HOST:$DIR"
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
@@ -61,18 +48,17 @@ jobs:
 
       # Step 4: Deploy to WEBRS
       - name: Deploy to WEBRS
-        env:
-          HOST_WEBRS: ${{ vars.HOST_WEBRS }}
-          DEPLOY_PATH_WEBRS: ${{ vars.DEPLOY_PATH_WEBRS }}
         run: |
-          if [ -z "$HOST_WEBRS" ]; then
-            echo "Error: HOST_WEBRS is not defined. Exiting."
-            exit 1
+          HOST=deploy@$HOST_WEBRS_PROD
+          DEPLOY_PATH=$DEPLOY_PATH_WEBRS_PROD
+          
+          if [ "${GITHUB_REF##*/}" == "develop" ]; then
+            HOST=deploy@$HOST_RS_STAGE
+            DEPLOY_PATH=$DEPLOY_PATH_RS_STAGE
           fi
-
-          HOST=deploy@$HOST_WEBRS
-          DIR=$DEPLOY_PATH_WEBRS/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
-
+          
+          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          
           echo "Deploying to $HOST:$DIR"
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
           rsync -avz --delete \
