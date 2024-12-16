@@ -30,8 +30,8 @@ jobs:
       # Step 3: Deploy to the destinations
       - name: Deploy to RS
         run: |
-          HOST=deploy@${{ env.HOST_RS }}
-          DIR=${{ env.DEPLOY_PATH_RS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          HOST=deploy@${{ vars.HOST_RS }}
+          DIR=${{ vars.DEPLOY_PATH_RS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
         
           # Ensure the directory exists on the remote server
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
@@ -44,8 +44,8 @@ jobs:
       # Step 4: Deploy to the destinations
       - name: Deploy to WEBRS
         run: |
-          HOST=deploy@${{ env.HOST_WEBRS }}
-          DIR=${{ env.DEPLOY_PATH_WEBRS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          HOST=deploy@${{ vars.HOST_WEBRS }}
+          DIR=${{ vars.DEPLOY_PATH_WEBRS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
 
           # Ensure the directory exists on the remote server
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
