@@ -12,8 +12,8 @@ jobs:
 
     # Staging runs automatically on develop, production only on main with manual trigger
     if: >
-      (github.event_name == 'push' && github.ref == 'refs/heads/develop' && environment == 'stage') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && environment == 'prod')
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
 
     steps:
       # Step 1: Check out the repository
