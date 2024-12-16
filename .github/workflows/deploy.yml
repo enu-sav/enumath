@@ -27,7 +27,19 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # Step 3: Deploy to the destinations
+      # Step 2: Set ENV
+      - name: Set environment variable by branch
+        run: |
+          if [ "${GITHUB_REF##*/}" == "develop" ]; then
+            echo "environment=stage" >> $GITHUB_ENV
+          elif [ "${GITHUB_REF##*/}" == "main" ]; then
+            echo "environment=prod" >> $GITHUB_ENV
+          else
+            echo "Unknown branch: ${GITHUB_REF##*/}"
+            exit 1
+          fi
+
+      # Step 4: Deploy to the destinations
       - name: Deploy to RS
         run: |
           HOST=deploy@${{ vars.HOST_RS }}
@@ -41,7 +53,7 @@ jobs:
             -e "ssh -p 5022 -o StrictHostKeyChecking=no" \
             ./ckeditor/plugins/enumath/ "$HOST:$DIR"
 
-      # Step 4: Deploy to the destinations
+      # Step 5: Deploy to the destinations
       - name: Deploy to WEBRS
         run: |
           HOST=deploy@${{ vars.HOST_WEBRS }}
