@@ -1,0 +1,56 @@
+name: Enumath Plugin Deployment
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch: # Allows manual triggering for production deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Staging runs automatically on develop, production only on main with manual trigger
+    if: >
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop' && environment == 'stage') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && environment == 'prod')
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      # Step 3: Deploy to the destinations
+      - name: Deploy to RS
+        run: |
+          HOST=deploy@${{ env.HOST_RS }}
+          DIR=${{ env.DEPLOY_PATH_RS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+        
+          # Ensure the directory exists on the remote server
+          ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
+        
+          # COpy files to the remote server destination
+          rsync -avz --delete \
+            -e "ssh -p 5022 -o StrictHostKeyChecking=no" \
+            ./ckeditor/plugins/enumath/ "$HOST:$DIR"
+
+      # Step 4: Deploy to the destinations
+      - name: Deploy to WEBRS
+        run: |
+          HOST=deploy@${{ env.HOST_WEBRS }}
+          DIR=${{ env.DEPLOY_PATH_WEBRS }}/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+
+          # Ensure the directory exists on the remote server
+          ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
+
+          # COpy files to the remote server destination
+          rsync -avz --delete \
+            -e "ssh -p 5022 -o StrictHostKeyChecking=no" \
+            ./ckeditor/plugins/enumath/ "$HOST:$DIR"
