@@ -29,12 +29,12 @@ jobs:
       # Step 3: Deploy to RS
       - name: Deploy to RS
         run: |
-          HOST=deploy@$HOST_RS_PROD
-          DEPLOY_PATH=$DEPLOY_PATH_RS_PROD
+          HOST=deploy@${{ vars.HOST_RS_PROD }}
+          DEPLOY_PATH=${{ vars.DEPLOY_PATH_RS_PROD }}
           
           if [ "${GITHUB_REF##*/}" == "develop" ]; then
-            HOST=deploy@$HOST_RS_STAGE
-            DEPLOY_PATH=$DEPLOY_PATH_RS_STAGE
+            HOST=deploy@${{ vars.HOST_RS_STAGE }}
+            DEPLOY_PATH=${{ vars.DEPLOY_PATH_RS_STAGE}}
           fi
           
           DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
@@ -49,12 +49,12 @@ jobs:
       # Step 4: Deploy to WEBRS
       - name: Deploy to WEBRS
         run: |
-          HOST=deploy@$HOST_WEBRS_PROD
-          DEPLOY_PATH=$DEPLOY_PATH_WEBRS_PROD
+          HOST=deploy@${{ vars.HOST_WEBRS_PROD }}
+          DEPLOY_PATH=${{ vars.DEPLOY_PATH_WEBRS_PROD }}
           
           if [ "${GITHUB_REF##*/}" == "develop" ]; then
-            HOST=deploy@$HOST_RS_STAGE
-            DEPLOY_PATH=$DEPLOY_PATH_RS_STAGE
+            HOST=deploy@${{ vars.HOST_WEBRS_STAGE }}
+            DEPLOY_PATH=${{ vars.DEPLOY_PATH_WEBRS_STAGE }}
           fi
           
           DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
