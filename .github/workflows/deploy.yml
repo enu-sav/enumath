@@ -1,0 +1,66 @@
+name: Enumath Plugin Deployment
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch: # Allows manual triggering for production deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    if: >
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH
+      - name: Setup SSH
+        run: |
+          mkdir -p /home/runner/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/id_rsa
+          chmod 600 /home/runner/.ssh/id_rsa
+
+      # Step 3: Deploy to RS
+      - name: Deploy to RS
+        run: |
+          HOST=deploy@${{ vars.HOST_RS_PROD }}
+          DEPLOY_PATH=${{ vars.DEPLOY_PATH_RS_PROD }}
+          
+          if [ "${GITHUB_REF##*/}" == "develop" ]; then
+            HOST=deploy@${{ vars.HOST_RS_STAGE }}
+            DEPLOY_PATH=${{ vars.DEPLOY_PATH_RS_STAGE}}
+          fi
+          
+          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+
+          echo "Deploying to $HOST:$DIR"
+          ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
+          rsync -avz --delete \
+            -e "ssh -p 5022 -o StrictHostKeyChecking=no" \
+            ./ckeditor/plugins/enumath/ "$HOST:$DIR"
+
+
+      # Step 4: Deploy to WEBRS
+      - name: Deploy to WEBRS
+        run: |
+          HOST=deploy@${{ vars.HOST_WEBRS_PROD }}
+          DEPLOY_PATH=${{ vars.DEPLOY_PATH_WEBRS_PROD }}
+          
+          if [ "${GITHUB_REF##*/}" == "develop" ]; then
+            HOST=deploy@${{ vars.HOST_WEBRS_STAGE }}
+            DEPLOY_PATH=${{ vars.DEPLOY_PATH_WEBRS_STAGE }}
+          fi
+          
+          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          
+          echo "Deploying to $HOST:$DIR"
+          ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
+          rsync -avz --delete \
+            -e "ssh -p 5022 -o StrictHostKeyChecking=no" \
+            ./ckeditor/plugins/enumath/ "$HOST:$DIR"
