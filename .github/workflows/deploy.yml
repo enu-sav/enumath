@@ -37,7 +37,7 @@ jobs:
             DEPLOY_PATH=${{ vars.DEPLOY_PATH_RS_STAGE}}
           fi
           
-          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugins/enumath
 
           echo "Deploying to $HOST:$DIR"
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
@@ -57,7 +57,7 @@ jobs:
             DEPLOY_PATH=${{ vars.DEPLOY_PATH_WEBRS_STAGE }}
           fi
           
-          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugin/enumath
+          DIR=$DEPLOY_PATH/docroot/profiles/rs_beliana/modules/contrib/ckeditor/plugins/enumath
           
           echo "Deploying to $HOST:$DIR"
           ssh -p 5022 -o StrictHostKeyChecking=no "$HOST" "mkdir -p $DIR"
